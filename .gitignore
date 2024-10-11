@@ -1,0 +1,5 @@
+# to test some data
+/dev 
+
+#hiding environment variables
+.env*
