@@ -22,29 +22,6 @@
             background-color: #f2f2f2;
         }
     </style>
-    <script>
-        // search func.
-        function searchTable() {
-            let input = document.getElementById("searchInput").value.toLowerCase();
-            let table = document.getElementById("taskTable");
-            let rows = table.getElementsByTagName("tr");
-
-            for (let i = 1; i < rows.length; i++) { 
-                let cells = rows[i].getElementsByTagName("td");
-                let found = false;
-
-                for (let j = 0; j < cells.length; j++) {
-                    let cellText = cells[j].innerText.toLowerCase();
-                    if (cellText.indexOf(input) > -1) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                rows[i].style.display = found ? "" : "none"; 
-            }
-        }
-    </script>
 </head>
 <body>
 <main class="container">
@@ -67,8 +44,9 @@ if (is_string($tasks)) {
             <th>Title</th>
             <th>Description</th>
             <th>Color Code</th>
-          </tr>";
-
+          </tr>
+          <tbody>";
+          
     foreach ($tasks as $task) {
         echo "<tr style='background-color: {$task['colorCode']} !important;'>";
         echo "<td>{$task['task']}</td>";
@@ -78,9 +56,60 @@ if (is_string($tasks)) {
         echo "</tr>";
     }
 
+    echo "</tbody>";
     echo "</table>";
 }
 ?>
     </main>
+    <script src="vendor/components/jquery/jquery.min.js" type="text/javascript"></script>
+    
+    <script>
+        function searchTable() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let table = document.getElementById("taskTable");
+            let rows = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < rows.length; i++) { 
+                let cells = rows[i].getElementsByTagName("td");
+                let found = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    let cellText = cells[j].innerText.toLowerCase();
+                    if (cellText.indexOf(input) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                rows[i].style.display = found ? "" : "none"; 
+            }
+        }
+
+        function updateTable() {
+            $.getJSON('api/get_tasks.php?refresh=true', function(data) {
+                let tableBody = $('#taskTable tbody');
+                tableBody.empty(); // Clear the existing table body
+                
+                data.forEach(task => {
+                    let row = `<tr>
+                        <td>${task.task}</td>
+                        <td>${task.title}</td>
+                        <td>${task.description}</td>
+                        <td style="background-color: ${task.colorCode}">${task.colorCode}</td>
+                    </tr>`;
+                    tableBody.append(row);
+                });
+            });
+        }
+
+        // On document ready, update the table once
+        $(document).ready(function() {
+            updateTable();
+            setInterval(function() {
+                updateTable();
+                console.log("refreshed");
+            }, 3600000); // 3600000ms = 60 minutes
+        });
+    </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <?php
 // get_tasks.php
 
-include 'auth.php'; // to take token include auth.php
+include 'auth.php';
 
 function getTasks() {
     $token = getAccessToken(); // take token
@@ -12,12 +12,12 @@ function getTasks() {
 
     $curl = curl_init();
     
-    // GET reguest
+    // GET request
     curl_setopt_array($curl, [
         CURLOPT_URL => "https://api.baubuddy.de/dev/index.php/v1/tasks/select",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer " . $token, // add token into header
+            "Authorization: Bearer " . $token, // token into header
             "Content-Type: application/json"
         ]
     ]);
@@ -31,5 +31,11 @@ function getTasks() {
     } else {
         return json_decode($response, true); // return JSON
     }
+}
+
+// req for refreshing data
+if (isset($_GET['refresh']) && $_GET['refresh'] == 'true') {
+    $tasks = getTasks();
+    echo json_encode($tasks); // return JSON response
 }
 ?>
