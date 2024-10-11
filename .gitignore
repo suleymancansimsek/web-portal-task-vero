@@ -1,5 +1,8 @@
 # to test some data
 /dev 
 
+#composer
+/vendor
+
 #hiding environment variables
 .env*
