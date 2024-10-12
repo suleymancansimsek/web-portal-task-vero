@@ -3,32 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light dark">
-    <link rel="stylesheet" href="vendor/picocss/pico/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+    
     <title>Task List</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+
+    <script src="vendor/components/jquery/jquery.min.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
 <main class="container">
 <h1>Task List</h1>
-
-<!-- Search Box -->
-<input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search for tasks..">
 
 <?php
 include 'api/get_tasks.php'; 
@@ -38,21 +24,23 @@ $tasks = getTasks();
 if (is_string($tasks)) {
     echo "<p>Something went wrong: $tasks</p>";
 } else {
-    echo "<table id='taskTable'>";
-    echo "<tr>
-            <th>Task</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Color Code</th>
-          </tr>
+    echo "<table id='taskTable' class='display cell-border'>";
+    echo "<thead>
+            <tr>
+                <th>Task</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Color Code</th>
+            </tr>
+          </thead>
           <tbody>";
           
     foreach ($tasks as $task) {
-        echo "<tr style='background-color: {$task['colorCode']} !important;'>";
+        echo "<tr>";
         echo "<td>{$task['task']}</td>";
         echo "<td>{$task['title']}</td>";
         echo "<td>{$task['description']}</td>";
-        echo "<td>{$task['colorCode']}</td>";
+        echo "<td style='background-color: {$task['colorCode']} !important;'>{$task['colorCode']}</td>";
         echo "</tr>";
     }
 
@@ -61,30 +49,8 @@ if (is_string($tasks)) {
 }
 ?>
     </main>
-    <script src="vendor/components/jquery/jquery.min.js" type="text/javascript"></script>
-    
+
     <script>
-        function searchTable() {
-            let input = document.getElementById("searchInput").value.toLowerCase();
-            let table = document.getElementById("taskTable");
-            let rows = table.getElementsByTagName("tr");
-
-            for (let i = 1; i < rows.length; i++) { 
-                let cells = rows[i].getElementsByTagName("td");
-                let found = false;
-
-                for (let j = 0; j < cells.length; j++) {
-                    let cellText = cells[j].innerText.toLowerCase();
-                    if (cellText.indexOf(input) > -1) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                rows[i].style.display = found ? "" : "none"; 
-            }
-        }
-
         function updateTable() {
             $.getJSON('api/get_tasks.php?refresh=true', function(data) {
                 let tableBody = $('#taskTable tbody');
@@ -99,11 +65,16 @@ if (is_string($tasks)) {
                     </tr>`;
                     tableBody.append(row);
                 });
+                
+                // Re-initialize DataTable after updating the table
+                $('#taskTable').DataTable().destroy(); // Destroy the existing instance
+                $('#taskTable').DataTable(); // Re-initialize
             });
         }
 
-        // On document ready, update the table once
+        // On document ready, initialize the DataTable
         $(document).ready(function() {
+            $('#taskTable').DataTable(); // Initialize DataTables
             updateTable();
             setInterval(function() {
                 updateTable();
