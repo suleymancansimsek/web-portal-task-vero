@@ -3,84 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="./assets/css/style.css">
+
     <title>Task List</title>
-
-    <script src="vendor/components/jquery/jquery.min.js" type="text/javascript"></script>
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
-<main class="container">
-<h1>Task List</h1>
+<?php include './includes/header.php'; ?>
 
-<?php
-include 'api/get_tasks.php'; 
+<main>
+    <div class="content">
+        <h1>Welcome to Vero Web Portal</h1>
+        <p>There are two features on this website! 
+            <a href="http://localhost/web-portal-task-vero/pages/table.php">table</a> | 
+            <a href="http://localhost/web-portal-task-vero/pages/upload.php">upload</a>
+        </p>
+    </div>
+</main>
 
-$tasks = getTasks();
-
-if (is_string($tasks)) {
-    echo "<p>Something went wrong: $tasks</p>";
-} else {
-    echo "<table id='taskTable' class='display cell-border'>";
-    echo "<thead>
-            <tr>
-                <th>Task</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Color Code</th>
-            </tr>
-          </thead>
-          <tbody>";
-          
-    foreach ($tasks as $task) {
-        echo "<tr>";
-        echo "<td>{$task['task']}</td>";
-        echo "<td>{$task['title']}</td>";
-        echo "<td>{$task['description']}</td>";
-        echo "<td style='background-color: {$task['colorCode']} !important;'>{$task['colorCode']}</td>";
-        echo "</tr>";
-    }
-
-    echo "</tbody>";
-    echo "</table>";
-}
-?>
-    </main>
-
-    <script>
-        function updateTable() {
-            $.getJSON('api/get_tasks.php?refresh=true', function(data) {
-                let tableBody = $('#taskTable tbody');
-                tableBody.empty(); // Clear the existing table body
-                
-                data.forEach(task => {
-                    let row = `<tr>
-                        <td>${task.task}</td>
-                        <td>${task.title}</td>
-                        <td>${task.description}</td>
-                        <td style="background-color: ${task.colorCode}">${task.colorCode}</td>
-                    </tr>`;
-                    tableBody.append(row);
-                });
-                
-                // Re-initialize DataTable after updating the table
-                $('#taskTable').DataTable().destroy(); // Destroy the existing instance
-                $('#taskTable').DataTable(); // Re-initialize
-            });
-        }
-
-        // On document ready, initialize the DataTable
-        $(document).ready(function() {
-            $('#taskTable').DataTable(); // Initialize DataTables
-            updateTable();
-            setInterval(function() {
-                updateTable();
-                console.log("refreshed");
-            }, 3600000); // 3600000ms = 60 minutes
-        });
-    </script>
+<?php include './includes/footer.php'; ?>
 </body>
 </html>
